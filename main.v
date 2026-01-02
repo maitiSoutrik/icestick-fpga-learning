@@ -33,7 +33,7 @@ module main #(
         LED2 = led_pattern[1];
         LED3 = led_pattern[2];
         LED4 = 1'b1;  // Always on
-        LED5 = counter[22]; // Fast blink
+        LED5 = counter[5]; // Fast blink - bit 5 works for both sim and hardware
     end
 
 endmodule
