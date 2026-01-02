@@ -1,0 +1,32 @@
+# Apio build outputs
+_build/
+*.bin
+*.asc
+*.json
+*.blif
+*.log
+*.out
+
+# Simulation outputs
+*.vcd
+*.fst
+*.fst.hier
+*.lxt
+*.lxt2
+*.ghw
+*.vvp
+
+# Verification outputs
+*.lint
+*.fmt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
