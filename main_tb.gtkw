@@ -1,0 +1,55 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 Wave View Save File.
+[*]
+
+[dumpfile] "_build/default/main_tb.vcd"
+
+[savefile] "main_tb.gtkw"
+
+[timestart] 0
+
+[size] 1600 1000
+
+[pos] -1 -1
+
+*-17.0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+
+[treeopen] main_tb.
+
+[treeopen] main_tb.uut.
+
+[sst_width] 250
+
+[signals_width] 200
+
+[sst_expanded] 1
+
+[sst_vpaned_height] 300
+
+@28
+main_tb.uut.CLK
+@200
+-Clock
+@22
+main_tb.uut.counter[23:0]
+@28
+@200
+-LEDs (Outputs)
+@28
+main_tb.uut.LED1
+main_tb.uut.LED2
+main_tb.uut.LED3
+main_tb.uut.LED4
+main_tb.uut.LED5
+@200
+-Internal Signals
+@22
+main_tb.uut.led_pattern[2:0]
+@28
+@200
+-Parameters
+@22
+main_tb.uut.COUNTER_MAX[31:0]
+
+[pattern_trace] 1
+[pattern_trace] 0

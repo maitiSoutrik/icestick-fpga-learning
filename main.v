@@ -1,4 +1,6 @@
-module main (
+module main #(
+    parameter COUNTER_MAX = 6_000_000  // Default for hardware, can override in testbench
+) (
     input wire CLK,
     output reg LED1,
     output reg LED2,
@@ -10,7 +12,7 @@ module main (
     // iCEstick has a 12MHz clock
     // To get a visible blink, divide it down to ~1Hz
     // 12,000,000 / 2 = 6,000,000 cycles for 0.5 second
-    localparam COUNTER_MAX = 6_000_000;
+    // For simulation, testbench can override with a smaller value
 
     reg [23:0] counter = 0;
     reg [2:0] led_pattern = 3'b001;

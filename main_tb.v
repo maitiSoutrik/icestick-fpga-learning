@@ -7,7 +7,10 @@ module main_tb;
     wire LED1, LED2, LED3, LED4, LED5;
 
     // Instantiate the module under test
-    main uut (
+    // Override COUNTER_MAX for faster simulation
+    main #(
+        .COUNTER_MAX(100)  // Much faster for simulation!
+    ) uut (
         .CLK(CLK),
         .LED1(LED1),
         .LED2(LED2),
@@ -25,10 +28,15 @@ module main_tb;
         // Let apio handle VCD file location - don't use $dumpfile()
         $dumpvars(0, main_tb);
 
-        // Run for a short time to verify functionality
-        #100000;  // 100 microseconds
+        // Monitor LED pattern changes
+        $monitor("Time=%0t ns | Pattern=%b%b%b LED4=%b LED5=%b | Counter=%0d",
+                 $time, LED1, LED2, LED3, LED4, LED5, uut.counter);
 
-        $display("LED1=%b, LED2=%b, LED3=%b, LED4=%b, LED5=%b",
+        // Run long enough to see multiple LED pattern rotations
+        #500000;  // 500 microseconds - enough to see many rotations
+
+        $display("\nSimulation complete!");
+        $display("Final: LED1=%b, LED2=%b, LED3=%b, LED4=%b, LED5=%b",
                  LED1, LED2, LED3, LED4, LED5);
 
         $finish;
