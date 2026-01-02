@@ -22,7 +22,7 @@ module main_tb;
 
     // Simulation
     initial begin
-        $dumpfile("main_tb.vcd");
+        // Let apio handle VCD file location - don't use $dumpfile()
         $dumpvars(0, main_tb);
 
         // Run for a short time to verify functionality
