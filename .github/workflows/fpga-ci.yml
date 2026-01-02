@@ -25,10 +25,6 @@ jobs:
         pip install apio
         apio --version
 
-    - name: Install Apio packages
-      run: |
-        apio packages --install --force
-
     - name: Run lint
       run: apio lint
 
