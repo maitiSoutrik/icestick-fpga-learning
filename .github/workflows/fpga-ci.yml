@@ -1,0 +1,57 @@
+name: FPGA CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Apio
+      run: |
+        pip install --upgrade pip
+        pip install apio
+        apio --version
+
+    - name: Install Apio packages
+      run: |
+        apio packages --install --force
+
+    - name: Run lint
+      run: apio lint
+
+    - name: Run tests
+      run: apio test
+
+    - name: Build bitstream
+      run: apio build
+
+    - name: Upload bitstream artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: fpga-bitstream
+        path: _build/default/hardware.bin
+        retention-days: 30
+
+    - name: Upload build reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: build-reports
+        path: |
+          _build/default/*.json
+          _build/default/*.pnr
+          _build/default/*.asc
+        retention-days: 7

@@ -1,5 +1,7 @@
 # iCEstick FPGA Learning Journey
 
+![FPGA CI](https://github.com/maitiSoutrik/icestick-fpga-learning/workflows/FPGA%20CI/badge.svg)
+
 This repository tracks my daily progress learning FPGA development with the iCEstick Eval Board (ICE40HX1K).
 
 ## Hardware
@@ -14,6 +16,15 @@ This repository tracks my daily progress learning FPGA development with the iCEs
 - `main_tb.v` - Testbench for simulation
 - `icestick.pcf` - Pin constraint file for iCEstick
 - `apio.ini` - Apio project configuration
+- `.github/workflows/` - CI/CD automation
+
+## Continuous Integration
+
+Every push automatically:
+- Runs `apio lint` to check code quality
+- Runs `apio test` to verify testbenches pass
+- Runs `apio build` to synthesize the bitstream
+- Uploads the `.bin` file as a downloadable artifact (30-day retention)
 
 ## Quick Start
 
@@ -48,10 +59,12 @@ A simple LED blinker that demonstrates:
 ## Learning Log
 
 ### Day 1
-- Set up Apio toolchain
-- Created basic LED blink project
-- Learned iCEstick pin mappings
-- Initial commit
+- Set up Apio toolchain and project structure
+- Created LED blink with rotating pattern (LED1-3) and fast blink (LED5)
+- Built simulation-friendly testbench with parameterized counter
+- Debugged LED5 bit indexing issue using GTKWave
+- Set up GitHub Actions CI for automated lint, test, build
+- Learned: Verilog parameters, testbench overrides, bit significance in counters
 
 ## Resources
 
