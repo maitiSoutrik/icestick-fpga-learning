@@ -3,6 +3,7 @@ module main #(
     parameter UART_SEND_INTERVAL = 12_000_000  // Send UART data every second
 ) (
     input wire CLK,
+    input wire UART_RX,  // UART RX line (connect to FTDI)
     output reg LED1,
     output reg LED2,
     output reg LED3,
@@ -20,13 +21,20 @@ module main #(
     reg [23:0] counter = 0;
     reg [2:0] led_pattern = 3'b001;
 
-    // UART control signals
+    // UART TX control signals
     reg uart_tx_start = 0;
     reg [7:0] uart_tx_data = 0;
     wire uart_tx_busy;
     wire uart_tx_done;
     reg [3:0] uart_state = 0;
     reg [23:0] uart_counter = 0;
+    
+    // UART RX control signals
+    wire uart_rx_ready;
+    wire [7:0] uart_rx_data;
+    wire uart_rx_error;
+    reg uart_rx_received = 0;
+    reg [7:0] uart_rx_last_byte = 0;
     
     // Button debounce for reset
     reg [15:0] reset_debounce = 0;
@@ -37,7 +45,7 @@ module main #(
     uart_tx #(
         .CLK_FREQ(12_000_000),
         .BAUD_RATE(9_600)
-    ) uart (
+    ) uart_tx_inst (
         .clk(CLK),
         .reset(reset),
         .tx_start(uart_tx_start),
@@ -45,6 +53,19 @@ module main #(
         .tx_busy(uart_tx_busy),
         .tx_done(uart_tx_done),
         .tx_line(UART_TX)
+    );
+    
+    // UART Receiver instance
+    uart_rx #(
+        .CLK_FREQ(12_000_000),
+        .BAUD_RATE(9_600)
+    ) uart_rx_inst (
+        .clk(CLK),
+        .reset(reset),
+        .rx_line(UART_RX),
+        .rx_ready(uart_rx_ready),
+        .rx_data(uart_rx_data),
+        .rx_error(uart_rx_error)
     );
 
     // LED blinking logic
@@ -66,7 +87,12 @@ module main #(
         // UART transmission state machine
         case (uart_state)
             0: begin  // Wait state
-                if (uart_counter >= UART_SEND_INTERVAL) begin
+                if (uart_rx_ready) begin
+                    // Received data from UART - echo it back
+                    uart_tx_data <= uart_rx_data;
+                    uart_tx_start <= 1;
+                    uart_state <= 7;  // Go to echo wait state
+                end else if (uart_counter >= UART_SEND_INTERVAL) begin
                     uart_counter <= 0;
                     uart_state <= 1;  // Go to first transmit state
                 end else begin
@@ -116,8 +142,28 @@ module main #(
                 end
             end
             
+            7: begin  // Wait for echo transmission to complete
+                if (uart_tx_done) begin
+                    uart_state <= 0;  // Go back to wait state
+                end
+            end
+            
             default: uart_state <= 0;
         endcase
+    end
+
+    // UART RX handling logic
+    always @(posedge CLK) begin
+        // Reset the received flag
+        if (uart_rx_received && counter[10]) begin  // Clear after a short delay
+            uart_rx_received <= 0;
+        end
+        
+        // Handle received byte
+        if (uart_rx_ready) begin
+            uart_rx_last_byte <= uart_rx_data;
+            uart_rx_received <= 1;  // Set flag to show we received data
+        end
     end
 
     // Assign pattern to LEDs
@@ -125,8 +171,8 @@ module main #(
         LED1 = led_pattern[0];
         LED2 = led_pattern[1];
         LED3 = led_pattern[2];
-        LED4 = uart_tx_busy;  // Show UART activity
-        LED5 = counter[5]; // Fast blink - bit 5 works for both sim and hardware
+        LED4 = uart_tx_busy;  // Show UART TX activity
+        LED5 = uart_rx_received; // Show when data received (stays on longer)
     end
 
 endmodule

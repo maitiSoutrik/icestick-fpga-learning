@@ -48,25 +48,31 @@ apio upload
 apio lint
 ```
 
-## Current Project: LED Blink with UART Telemetry
+## Current Project: Bidirectional UART Communication
 
 An enhanced FPGA design that demonstrates:
 - Clock division from 12MHz to visible rates
 - Rotating LED pattern across LED1-LED3
-- LED4 indicates UART activity (lit during transmission)
-- LED5 fast blink from counter MSB
-- UART transmitter with configurable baud rate
-- State machine design for sequential UART data transmission
+- LED4 indicates UART TX activity (lit during transmission)
+- LED5 indicates UART RX activity (lit when data received)
+- Full-duplex UART communication with configurable baud rate
+- UART transmitter for sending status data
+- UART receiver for accepting commands
+- State machine design for sequential UART operations
+- Automatic echo functionality (received data is sent back)
 - Periodic status reporting over UART (9600 baud)
 
 ## Files
 
-- `main.v` - Top-level module with LED controller and UART integration
+- `main.v` - Top-level module with LED controller and bidirectional UART
 - `uart_tx.v` - UART transmitter module with configurable baud rate
+- `uart_rx.v` - UART receiver module with configurable baud rate
 - `main_tb.v` - Testbench for main module
 - `uart_tx_tb.v` - Dedicated UART transmitter testbench
+- `uart_rx_tb.v` - Dedicated UART receiver testbench
 - `icestick.pcf` - Pin constraints for iCEstick board
-- `UART_USAGE.md` - Documentation for using the UART module
+- `UART_USAGE.md` - Documentation for using the UART TX module
+- `BIDIRECTIONAL_UART.md` - Documentation for bidirectional UART communication
 
 ## Learning Log
 
@@ -94,6 +100,17 @@ An enhanced FPGA design that demonstrates:
 - Modified LED behavior to indicate UART activity
 - Enhanced testbench with UART monitoring capabilities
 - Learned: FSM design, UART protocol, serial communication
+
+### Day 3
+- Implemented UART receiver module (uart_rx.v)
+- Added input synchronization for metastability prevention
+- Created robust receiver FSM with error detection
+- Integrated bidirectional UART communication (full-duplex)
+- Implemented automatic echo functionality
+- Modified LED5 to indicate received data
+- Created dedicated testbench for UART RX validation
+- Added detailed documentation for bidirectional UART usage
+- Learned: Input synchronization, framing error detection, full-duplex communication
 
 ## Resources
 

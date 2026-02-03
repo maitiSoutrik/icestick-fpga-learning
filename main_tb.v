@@ -4,6 +4,7 @@
 module main_tb;
 
     reg CLK;
+    reg UART_RX;
     wire LED1, LED2, LED3, LED4, LED5, UART_TX;
 
     // Instantiate the module under test
@@ -13,6 +14,7 @@ module main_tb;
         .UART_SEND_INTERVAL(1000)    // Faster UART transmission
     ) uut (
         .CLK(CLK),
+        .UART_RX(UART_RX),
         .LED1(LED1),
         .LED2(LED2),
         .LED3(LED3),
@@ -22,7 +24,10 @@ module main_tb;
     );
 
     // Generate 12MHz clock (period = 83.33ns)
-    initial CLK = 0;
+    initial begin 
+        CLK = 0;
+        UART_RX = 1;  // Idle state is high
+    end
     always #41.67 CLK = ~CLK;
 
     // UART RX Monitor - simple UART receiver to log data
@@ -56,6 +61,30 @@ module main_tb;
                     (received_data >= 32 && received_data < 127) ? received_data : ".");
         end
     endtask
+    
+    // Task to send a byte to the FPGA's UART_RX input
+    task send_byte_to_fpga;
+        input [7:0] data;
+        integer i;
+        begin
+            // Start bit (low)
+            UART_RX = 1'b0;
+            #bit_time;
+            
+            // Data bits (LSB first)
+            for (i = 0; i < 8; i = i + 1) begin
+                UART_RX = data[i];
+                #bit_time;
+            end
+            
+            // Stop bit (high)
+            UART_RX = 1'b1;
+            #bit_time;
+            
+            $display("Sent byte 0x%02X (%c) to FPGA", data, 
+                    (data >= 32 && data < 127) ? data : ".");
+        end
+    endtask
 
     // Simulation
     initial begin
@@ -66,8 +95,29 @@ module main_tb;
         $monitor("Time=%0t ns | Pattern=%b%b%b LED4=%b LED5=%b | Counter=%0d",
                  $time, LED1, LED2, LED3, LED4, LED5, uut.counter);
 
-        // Run long enough to see multiple UART transmissions
-        #2000000;  // 2 milliseconds
+        // Run for a while to see UART TX activity
+        #1000000;  // 1 millisecond
+        
+        // Now simulate sending data to the FPGA
+        $display("\nSending data to FPGA UART_RX...");
+        
+        // Calculate bit time based on baud rate in testbench (in ns)
+        bit_time = 1_000_000_000 / 9600;
+        
+        // Send character 'A' (0x41)
+        send_byte_to_fpga(8'h41);
+        #(bit_time * 10);  // Wait for processing
+        
+        // Send character 'B' (0x42)
+        send_byte_to_fpga(8'h42);
+        #(bit_time * 10);
+        
+        // Send character '1' (0x31)
+        send_byte_to_fpga(8'h31);
+        #(bit_time * 10);
+        
+        // Run a bit longer to see echo responses
+        #1000000;  // 1 millisecond
 
         $display("\nSimulation complete!");
         $display("Final: LED1=%b, LED2=%b, LED3=%b, LED4=%b, LED5=%b",

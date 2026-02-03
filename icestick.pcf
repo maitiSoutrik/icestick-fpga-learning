@@ -15,6 +15,10 @@ set_io LED5 95
 # Using pin 8 (PIO1_02) which connects to FTDI RX
 set_io UART_TX 8
 
+# UART RX (connect to FTDI TX)
+# Using pin 9 (PIO1_03) which connects to FTDI TX
+set_io UART_RX 9
+
 # NOTE: For UART communication using the built-in FTDI chip:
 # - UART_TX (FPGA output) connects to RXD (pin 8)
-# - If implementing UART_RX in the future, use TXD (pin 9)
+# - UART_RX (FPGA input) connects to TXD (pin 9)
